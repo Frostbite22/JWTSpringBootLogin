@@ -1,6 +1,5 @@
 package com.app.jwt.loginjwt.service;
 
-import java.util.Collection;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -22,21 +21,27 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserServiceImpl implements UserService {
 	
+	@Autowired
 	private UserRepository userRepository ;
+	@Autowired
 	private RoleRepository roleRepository ; 
 	@Override
 	public User save(User user) {
+		log.info("Saving user to the database",user.getName());
 		return userRepository.save(user);
 	}
 
 	@Override
 	public Role saveRole(Role role) {
+		log.info("Saving user to the database",role.getName());
 		return roleRepository.save(role);
 		
 	}
 
 	@Override
 	public void addRoleToUser(String username, String roleName) {
+		log.info("Add role {} to {} ",roleName,username);
+
 		User user = userRepository.findByUsername(username);
 		Role role = roleRepository.findByName(roleName);
 		user.getRoles().add(role);
@@ -44,13 +49,16 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User getUser(String username) {
+		log.info("Fetching User {}",username);
+
 		return userRepository.findByUsername(username);
 	}
 
 	@Override
 	public List<User> getUsers() {
-		
-		return userRepository.findAll();
+		log.info("Fetching all users");
+
+		return userRepository.findAll() ;
 	}
 
 }
