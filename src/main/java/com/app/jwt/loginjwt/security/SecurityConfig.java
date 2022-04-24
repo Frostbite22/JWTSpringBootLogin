@@ -3,6 +3,7 @@ package com.app.jwt.loginjwt.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,7 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 import com.app.jwt.loginjwt.filter.CustomAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
@@ -33,10 +33,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		// TODO Auto-generated method stub
+		CustomAuthenticationFilter customAuthenticationFilter = 
+				new CustomAuthenticationFilter(authenticationManagerBean());
+		customAuthenticationFilter.setFilterProcessesUrl("/api/login");
 		http.csrf().disable();
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		http.authorizeRequests().anyRequest().permitAll();
-		http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
+		http.authorizeHttpRequests().antMatchers("/api/login/**").permitAll();
+		http.authorizeHttpRequests().antMatchers(HttpMethod.GET,"/api/user/**").hasAnyAuthority("ROLE_USER");
+		http.authorizeHttpRequests().antMatchers(HttpMethod.POST,"/api/user/save/**").hasAnyAuthority("ROLE_ADMIN"); 
+		http.authorizeHttpRequests().anyRequest().authenticated();
+		http.addFilter(customAuthenticationFilter);
 	}
 	
 	@Bean 
